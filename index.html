@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="fa">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>بازی قطار دو بعدی (Tiny Rails Style)</title>
+    <link
+      rel="shortcut icon"
+      href="./favicon.ico"
+      type="image/x-icon"
+    />
+    <link
+      rel="stylesheet"
+      href="./src/assets/css/index.css"
+    />
+  </head>
+  <body>
+    <div id="game-container">
+      <div
+        class="mountain-layer"
+        id="mountains"
+      ></div>
+
+      <div
+        class="scenery"
+        id="scenery-layer"
+      >
+        <div class="tree"></div>
+        <div class="tree"></div>
+        <div class="station">ایستگاه اول</div>
+        <div class="tree"></div>
+        <div class="station">ایستگاه مرکزی</div>
+        <div class="tree"></div>
+      </div>
+
+      <div id="railway"></div>
+
+      <div id="train-group">
+        <div class="wagon"></div>
+        <div class="wagon"></div>
+        <div class="locomotive">
+          <div class="cabin-window"></div>
+          <div class="chimney"></div>
+          <div class="smoke"></div>
+        </div>
+      </div>
+
+      <div id="speed-display">
+        سرعت: <span id="speed-val">0</span> کیلومتر بر ساعت
+      </div>
+
+      <div id="controls">
+        <button id="btn-slow">کاهش سرعت</button>
+        <button
+          id="btn-stop"
+          style="background-color: #ffdde0"
+        >
+          توقف اضطراری
+        </button>
+        <button
+          id="btn-fast"
+          style="background-color: #e2fcd4"
+        >
+          افزایش سرعت
+        </button>
+      </div>
+    </div>
+
+    <script
+      type="module"
+      src="./src/index.js"
+    ></script>
+  </body>
+</html>

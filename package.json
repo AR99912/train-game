@@ -1,0 +1,27 @@
+{
+  "name": "train-game",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite --port 5000",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AR99912/train-game.git"
+  },
+  "keywords": [],
+  "author": "AR99912",
+  "license": "MIT",
+  "type": "module",
+  "private": true,
+  "bugs": {
+    "url": "https://github.com/AR99912/train-game/issues"
+  },
+  "homepage": "https://github.com/AR99912/train-game#readme",
+  "devDependencies": {
+    "vite": "^8.3.2"
+  }
+}
