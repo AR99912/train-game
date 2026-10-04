@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0"
     />
-    <title>بازی مدیریت قطار (Tiny Rails Style) - نسخه پیشرفته</title>
+    <title>بازی قطار سریع‌السیر مدرن</title>
     <link
       rel="shortcut icon"
       href="./favicon.ico"
@@ -19,42 +19,32 @@
   </head>
   <body>
     <div id="game-container">
-      <!-- پنل وضعیت بازی -->
       <div id="hud">
         <div class="hud-panel">
           <div>امتیاز: <span id="score-val">0</span></div>
-          <div>مسافران کل: <span id="passengers-val">12</span> نفر</div>
+          <div>مسافران: <span id="passengers-val">0</span> نفر</div>
         </div>
         <div class="hud-panel">
-          <div id="station-alert">
-            ⚠️ در حال نزدیک شدن به ایستگاه! ترمز کنید!
-          </div>
+          <div id="station-alert">⚠️ نزدیک ایستگاه! ترمز کنید!</div>
           <div style="direction: ltr">
             SPEED: <span id="speed-val">0</span> km/h
           </div>
         </div>
       </div>
 
-      <!-- لایه کوه‌ها -->
       <div
         class="mountain-layer"
         id="mountains"
       ></div>
-
-      <!-- لایه متحرک المان‌ها (ایستگاه، درخت، مانع) -->
       <div
         class="scenery-container"
         id="scenery-layer"
-      >
-        <!-- محتوا پویا توسط جی‌اس تزریق می‌شود -->
-      </div>
+      ></div>
 
-      <!-- ریل -->
       <div id="railway-container">
         <div id="railway"></div>
       </div>
 
-      <!-- قطار طولانی تر (۵ واگن + ۱ لوکوموتیو) -->
       <div id="train-group">
         <div class="wagon">
           <div class="wagon-windows"></div>
@@ -93,11 +83,10 @@
         </div>
         <div class="locomotive">
           <div class="cabin"></div>
-          <div class="chimney"></div>
-          <div class="smoke-container"><div class="smoke"></div></div>
+          <div class="headlight"></div>
           <div
             class="wheel-pair"
-            style="left: 10px; right: 10px"
+            style="left: 15px; right: 15px"
           >
             <div class="wheel"></div>
             <div class="wheel"></div>
@@ -106,26 +95,45 @@
         </div>
       </div>
 
-      <!-- دکمه‌های کنترلی پایین صفحه -->
       <div id="controls-bar">
-        <button
-          class="btn btn-orange"
-          id="btn-slow"
-        >
-          کاهش سرعت
-        </button>
-        <button
-          class="btn btn-red"
-          id="btn-stop"
-        >
-          توقف (ترمز)
-        </button>
-        <button
-          class="btn btn-green"
-          id="btn-fast"
-        >
-          حرکت / افزایش سرعت
-        </button>
+        <div class="control-group">
+          <button
+            class="btn btn-dark"
+            id="btn-toggle-time"
+          >
+            ☀️ / 🌙 تغییر زمان
+          </button>
+        </div>
+
+        <div class="control-group">
+          <button
+            class="btn btn-action"
+            id="btn-clear-obstacle"
+          >
+            برطرف کردن مانع
+          </button>
+        </div>
+
+        <div class="control-group">
+          <button
+            class="btn btn-blue"
+            id="btn-slow"
+          >
+            کاهش سرعت
+          </button>
+          <button
+            class="btn btn-red"
+            id="btn-stop"
+          >
+            ترمز کامل
+          </button>
+          <button
+            class="btn btn-green"
+            id="btn-fast"
+          >
+            افزایش سرعت
+          </button>
+        </div>
       </div>
     </div>
 
