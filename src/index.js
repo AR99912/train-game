@@ -10,9 +10,11 @@ const gameContainer = document.getElementById("game-container");
 const trainGroup = document.getElementById("train-group");
 const btnClearObstacle = document.getElementById("btn-clear-obstacle");
 const btnTime = document.getElementById("btn-toggle-time");
+const btnWeather = document.getElementById("btn-toggle-weather");
+const btnHorn = document.getElementById("btn-horn");
 const wagons = document.querySelectorAll(".wagon-windows");
-const gameOverScreen = document.getElementById("game-over-screen");
-const bloodSplatter = document.getElementById("blood-splatter");
+const bloodCanvas = document.getElementById("blood-canvas");
+const ctx = bloodCanvas.getContext("2d");
 
 // ابرها برای تحرک هوشمند
 const cloud1 = document.getElementById("cloud1");
@@ -20,18 +22,35 @@ const cloud2 = document.getElementById("cloud2");
 let cloud1X = 100,
   cloud2X = 500;
 
+// وب آدیو برای شبیه‌سازی صدای بوق (بیب بیب) کاملاً بومی بدون فایل خارجی
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playHornSound() {
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "square";
+    osc.frequency.setValueAtTime(440, audioCtx.currentTime); // فرکانس صدا
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    osc.start();
+    // تولید حالت بیب بیب مقطع کوتاه
+    setTimeout(() => osc.stop(), 150);
+  } catch (e) {}
+}
+
 // فیزیک حرکت
 document.getElementById("btn-fast").addEventListener("click", () => {
-  if (!isGameOver) targetSpeed = Math.min(maxSpeed, targetSpeed + 3.5);
+  targetSpeed = Math.min(maxSpeed, targetSpeed + 3.5);
 });
 document.getElementById("btn-slow").addEventListener("click", () => {
-  if (!isGameOver) targetSpeed = Math.max(0, targetSpeed - 3.5);
+  targetSpeed = Math.max(0, targetSpeed - 3.5);
 });
 document.getElementById("btn-stop").addEventListener("click", () => {
-  if (!isGameOver) targetSpeed = 0;
+  targetSpeed = 0;
 });
 
-// ۱. چرخه زمان ۴ حالته
+// چرخه زمان ۴ حالته
 const times = ["morning", "noon", "evening", "night"];
 const timeLabels = {
   morning: "صبح🌅",
@@ -42,7 +61,6 @@ const timeLabels = {
 let currentTimeIndex = 1;
 
 btnTime.addEventListener("click", () => {
-  if (isGameOver) return;
   gameContainer.classList.remove(...times);
   currentTimeIndex = (currentTimeIndex + 1) % times.length;
   let newTime = times[currentTimeIndex];
@@ -50,7 +68,63 @@ btnTime.addEventListener("click", () => {
   btnTime.innerText = `⏰ چرخه زمان (${timeLabels[newTime]})`;
 });
 
-// ۲. سوییچ رندوم بین ۵ استایل قطار مدرن
+// سیستم آب و هوای هوشمند ۴ فصل
+const seasons = ["summer", "autumn", "winter", "spring"];
+const seasonLabels = {
+  summer: "تابستان☀️",
+  autumn: "پاییز🍁",
+  winter: "زمستان❄️",
+  spring: "بهار🌸",
+};
+let currentSeasonIndex = 0;
+let snowParticles = [];
+
+btnWeather.addEventListener("click", () => {
+  currentSeasonIndex = (currentSeasonIndex + 1) % seasons.length;
+  let currentSeason = seasons[currentSeasonIndex];
+  btnWeather.innerText = `🌦️ فصل: ${seasonLabels[currentSeason]}`;
+
+  if (currentSeason === "winter") {
+    mountains.classList.add("winter-mountains");
+    initSnow();
+  } else {
+    mountains.classList.remove("winter-mountains");
+    clearSnow();
+  }
+});
+
+function initSnow() {
+  clearSnow();
+  for (let i = 0; i < 40; i++) {
+    let flake = document.createElement("div");
+    flake.className = "snowflake";
+    flake.style.left = Math.random() * 950 + "px";
+    flake.style.width = flake.style.height = Math.random() * 4 + 2 + "px";
+    flake.style.animationDuration = Math.random() * 3 + 2 + "s";
+    flake.style.animationDelay = Math.random() * 2 + "s";
+    gameContainer.appendChild(flake);
+    snowParticles.push(flake);
+  }
+}
+function clearSnow() {
+  snowParticles.forEach((p) => p.remove());
+  snowParticles = [];
+}
+
+// عملکرد بوق زدن
+function triggerHorn() {
+  playHornSound();
+  createPopEffect("🔊 بیب بیب!", 600, 200, "pop-horn");
+}
+btnHorn.addEventListener("click", triggerHorn);
+window.addEventListener("keydown", (e) => {
+  if (e.code === "Space") {
+    e.preventDefault();
+    triggerHorn();
+  }
+});
+
+// سوییچ رندوم بین ۵ استایل قطار مدرن
 const trainStyles = [
   "train-maglev",
   "train-retro",
@@ -60,10 +134,8 @@ const trainStyles = [
 ];
 let currentStyleIndex = 0;
 document.getElementById("btn-change-style").addEventListener("click", () => {
-  if (isGameOver) return;
   trainGroup.classList.remove(...trainStyles);
   let nextIndex;
-  // انتخاب یک حالت کاملا جدید متفاوت با قبلی
   do {
     nextIndex = Math.floor(Math.random() * trainStyles.length);
   } while (nextIndex === currentStyleIndex);
@@ -71,9 +143,9 @@ document.getElementById("btn-change-style").addEventListener("click", () => {
   trainGroup.classList.add(trainStyles[currentStyleIndex]);
 });
 
-// ۳. مدیریت رفع مانع
+// مدیریت رفع مانع
 btnClearObstacle.addEventListener("click", () => {
-  if (activeObstacleIndex !== null && !isGameOver) {
+  if (activeObstacleIndex !== null) {
     elements[activeObstacleIndex].active = false;
     let dom = document.getElementById("el-" + activeObstacleIndex);
     if (dom) dom.classList.add("laser-hit");
@@ -95,7 +167,7 @@ let score = 0,
 let mountPosX = 0,
   railPosX = 0;
 let activeObstacleIndex = null;
-let isGameOver = false;
+let bloodSpots = [];
 
 const obstacleTypes = [
   { icon: "🪵", label: "🪓 خرد کردن کنده‌ها", isLiving: false },
@@ -112,7 +184,7 @@ function resetMapData() {
     {
       type: "station",
       x: 1000,
-      name: "ایستگاه شیراز پیاده‌روی",
+      name: "ایستگاه شیراز",
       passengers: 5,
       visited: false,
     },
@@ -122,16 +194,17 @@ function resetMapData() {
     {
       type: "station",
       x: 3400,
-      name: "ایستگاه مگاپولیس تهران",
+      name: "ایستگاه تهران",
       passengers: 8,
       visited: false,
     },
     { type: "tree", x: 4100 },
     { type: "obstacle", x: 4700, active: true, info: obstacleTypes[1] },
+    { type: "tree", x: 5100 },
     {
       type: "station",
-      x: 5400,
-      name: "ایستگاه نئون مشهد",
+      x: 5700,
+      name: "ایستگاه مشهد",
       passengers: 11,
       visited: false,
     },
@@ -193,35 +266,47 @@ function createPopEffect(text, x, y, className) {
   setTimeout(() => pop.remove(), 900);
 }
 
-// عملکرد خشن گیم اور تصادف با جانداران
-function triggerFatalCollision() {
-  isGameOver = true;
-  targetSpeed = 0;
-  speed = 0;
-  btnClearObstacle.style.display = "none";
+// افکت جذاب پاشیدن لکه‌های خون تصادفی رو تصویر (بدون گیم اور شدن)
+function splatterBloodEffect() {
+  createPopEffect("💥 برخورد کردی!", 550, 180, "pop-loss");
+  // تولید ۱۰ لکه خون تصادفی در کادر تصویر
+  for (let i = 0; i < 12; i++) {
+    bloodSpots.push({
+      x: Math.random() * bloodCanvas.width,
+      y: Math.random() * bloodCanvas.height,
+      radius: Math.random() * 25 + 8,
+      alpha: 0.9,
+    });
+  }
+}
 
-  // ۱. فلاش افکت خون
-  bloodSplatter.style.opacity = "1";
+// رندر و محو شدن تدریجی لکه‌های خون روی بوم
+function drawBloodSplatter() {
+  ctx.clearRect(0, 0, bloodCanvas.width, bloodCanvas.height);
+  for (let i = bloodSpots.length - 1; i >= 0; i--) {
+    let spot = bloodSpots[i];
+    ctx.beginPath();
+    ctx.fillStyle = `rgba(185, 28, 28, ${spot.alpha})`;
+    ctx.arc(spot.x, spot.y, spot.radius, 0, Math.PI * 2);
+    ctx.fill();
 
-  // ۲. فعالسازی صفحه باخت بعد از نیم ثانیه
-  setTimeout(() => {
-    gameOverScreen.classList.add("active");
-  }, 300);
+    // افزودن چند قطره کوچک اطراف لکه اصلی برای طبیعی تر شدن
+    ctx.beginPath();
+    ctx.fillStyle = `rgba(153, 27, 27, ${spot.alpha * 0.8})`;
+    ctx.arc(
+      spot.x + spot.radius * 0.5,
+      spot.y + spot.radius * 0.4,
+      spot.radius * 0.3,
+      0,
+      Math.PI * 2,
+    );
+    ctx.fill();
 
-  // ۳. ریست کامل دیتای بازی بعد از ۳ ثانیه معطلی
-  setTimeout(() => {
-    score = 0;
-    coins = 0;
-    totalPassengers = 8;
-    scoreVal.innerText = score;
-    coinVal.innerText = coins;
-    isGameOver = false;
-    gameOverScreen.classList.remove("active");
-    bloodSplatter.style.opacity = "0";
-    resetMapData();
-    createMapElements();
-    updateWagonPassengers();
-  }, 3500);
+    spot.alpha -= 0.004; // سرعت محو شدن لکه‌ها
+    if (spot.alpha <= 0) {
+      bloodSpots.splice(i, 1);
+    }
+  }
 }
 
 let wheelRotation = 0;
@@ -229,7 +314,10 @@ function gameLoop() {
   speed += (targetSpeed - speed) * 0.05;
   if (speed < 0.02) speed = 0;
 
-  speedVal.innerText = Math.round(speed * 22);
+  let currentDisplaySpeed = Math.round(speed * 22);
+  speedVal.innerText = currentDisplaySpeed;
+
+  drawBloodSplatter();
 
   if (speed > 0.1) {
     wheelRotation += speed * 3;
@@ -243,9 +331,8 @@ function gameLoop() {
 
     mountPosX -= speed * 0.12;
     if (mountPosX <= -950) mountPosX = 0;
-    mountains.style.transform = `translateX(${mountPosX}px)`;
+    mountMountains(mountPosX);
 
-    // تحرک ابرها موازی با سرعت قطار
     cloud1X -= speed * 0.2;
     if (cloud1X < -150) cloud1X = 1000;
     cloud2X -= speed * 0.15;
@@ -256,7 +343,39 @@ function gameLoop() {
 
   let trainFrontX = 60 + 6 * 95;
   let showAlert = false;
-  let obstacleNear = false;
+
+  // پیدا کردن نزدیک‌ترین ایستگاه پیش‌رو برای محاسبه کیلومتر و زمان
+  let nextStation = null;
+  elements.forEach((el) => {
+    if (el.type === "station" && el.x - trainFrontX > -100) {
+      if (!nextStation || el.x < nextStation.x) {
+        nextStation = el;
+      }
+    }
+  });
+
+  if (nextStation) {
+    document.getElementById("next-station-name").innerText = nextStation.name;
+    // فرمول تبدیل لوکال مختصات به کیلومتر فرضی بازی
+    let distanceKm = Math.max(
+      0,
+      ((nextStation.x - trainFrontX) / 100).toFixed(1),
+    );
+    document.getElementById("distance-val").innerText = distanceKm;
+
+    // محاسبه زمان باقی مانده بر اساس سرعت لحظه‌ای: T = D / V
+    if (currentDisplaySpeed > 0) {
+      let etaSeconds = Math.round((distanceKm / currentDisplaySpeed) * 3600);
+      if (etaSeconds > 60) {
+        document.getElementById("eta-val").innerText =
+          `${Math.floor(etaSeconds / 60)} دقیقه`;
+      } else {
+        document.getElementById("eta-val").innerText = `${etaSeconds} ثانیه`;
+      }
+    } else {
+      document.getElementById("eta-val").innerText = "متوقف شده";
+    }
+  }
 
   elements.forEach((el, index) => {
     el.x -= speed;
@@ -296,8 +415,7 @@ function gameLoop() {
       }
     }
 
-    // منطق هوشمند ایستگاه (پیاده و سوار شدن ترکیبی مسافران)
-    if (el.type === "station" && !isGameOver) {
+    if (el.type === "station") {
       let distanceToStation = el.x - trainFrontX;
       if (distanceToStation > 0 && distanceToStation < 350 && !el.visited) {
         showAlert = true;
@@ -306,13 +424,12 @@ function gameLoop() {
       if (el.x > 250 && el.x < 420 && speed === 0 && !el.visited) {
         el.visited = true;
 
-        // ۱. سیستم پیاده شدن مسافران قبلی (رندوم بین 1 تا 4 نفر)
         let leftPassengers = 0;
         if (totalPassengers > 2) {
           leftPassengers = Math.floor(Math.random() * 3) + 1;
           leftPassengers = Math.min(leftPassengers, totalPassengers - 1);
           totalPassengers -= leftPassengers;
-          let cashEarned = leftPassengers * 25; // کسب درآمد واقعی از پیاده شدن
+          let cashEarned = leftPassengers * 25;
           coins += cashEarned;
           createPopEffect(
             `💸 خروج مسافر: +${cashEarned}🪙`,
@@ -322,7 +439,6 @@ function gameLoop() {
           );
         }
 
-        // ۲. سوار شدن مسافران جدید ایستگاه
         let pointsEarned = el.passengers * 50;
         let initialCoins = el.passengers * 15;
 
@@ -345,26 +461,24 @@ function gameLoop() {
       }
     }
 
-    // منطق بحرانی کنترل موانع
-    if (el.type === "obstacle" && el.active && !isGameOver) {
+    if (el.type === "obstacle" && el.active) {
       let distanceToObstacle = el.x - trainFrontX;
 
       if (distanceToObstacle > 0 && distanceToObstacle < 400) {
-        obstacleNear = true;
         activeObstacleIndex = index;
         btnClearObstacle.innerText = el.info.label;
         btnClearObstacle.style.display = "block";
       }
 
-      // تلاقی و تصادف قطار با مانع
+      // تلاقی و تصادف قطار با مانع جاندار یا بی‌جان
       if (distanceToObstacle > -10 && distanceToObstacle < 30) {
         if (speed > 1) {
           if (el.info.isLiving) {
-            // اگر انسان یا حیوان بود -> خونریزی شدید و مرگبار
-            triggerFatalCollision();
-            return;
+            // طبق ایده جدید شما: پاشیدن خون روی تصویر بدون گیم اور یا ریست شدن بازی!
+            splatterBloodEffect();
+            score = Math.max(0, score - 80);
+            scoreVal.innerText = score;
           } else {
-            // اگر تخته چوب بی جان بود -> فقط جریمه مالی و کسر امتیاز ساده
             score = Math.max(0, score - 120);
             coins = Math.max(0, coins - 45);
             scoreVal.innerText = score;
@@ -380,23 +494,20 @@ function gameLoop() {
           }
         }
         el.active = false;
-        targetSpeed = 0;
-        speed = 0;
         btnClearObstacle.style.display = "none";
-        activeObstacleIndex = null;
       }
     }
   });
-
-  if (!obstacleNear && activeObstacleIndex !== null) {
-    btnClearObstacle.style.display = "none";
-    activeObstacleIndex = null;
-  }
 
   stationAlert.style.display = showAlert ? "block" : "none";
   requestAnimationFrame(gameLoop);
 }
 
+function mountMountains(pos) {
+  mountains.style.transform = `translateX(${pos}px)`;
+}
+
+// استارت اولیه بازی
 resetMapData();
 createMapElements();
 updateWagonPassengers();

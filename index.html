@@ -22,6 +22,12 @@
       id="game-container"
       class="noon"
     >
+      <canvas
+        id="blood-canvas"
+        width="950"
+        height="480"
+      ></canvas>
+
       <div
         id="sun"
         class="sky-element"
@@ -41,22 +47,30 @@
         style="left: 500px; transform: scale(0.6); top: 40px"
       ></div>
 
-      <div id="game-over-screen">
-        <h1>🩸 فاجعه رو ریل!</h1>
-        <p>تو یک موجود زنده رو کشتی! بازی کلاً ریست میشه...</p>
-      </div>
-      <div id="blood-splatter"></div>
-
       <div id="hud">
-        <div class="hud-panel">
-          <div>امتیاز: <span id="score-val">0</span></div>
-          <div>ثروت: <span id="coin-val">0</span> 🪙</div>
-          <div>مسافران: <span id="passengers-val">0</span> نفر</div>
-        </div>
-        <div class="hud-panel">
-          <div id="station-alert">🚨 ایستگاه نزدیک است! سریعاً ترمز کنید!</div>
-          <div style="direction: ltr">
-            SPEED: <span id="speed-val">0</span> km/h
+        <div class="hud-row">
+          <div class="hud-panel">
+            <div>امتیاز: <span id="score-val">0</span></div>
+            <div>ثروت: <span id="coin-val">0</span> 🪙</div>
+            <div>مسافران: <span id="passengers-val">0</span> نفر</div>
+          </div>
+
+          <div class="speedometer-panel">
+            <div>SPEEDOMETER</div>
+            <span id="speed-val">0</span>
+            <span style="font-size: 11px; color: #38bdf8">km/h</span>
+          </div>
+
+          <div class="hud-panel">
+            <div id="station-alert">
+              🚨 ایستگاه نزدیک است! سریعاً ترمز کنید!
+            </div>
+            <div style="text-align: right; font-size: 11.5px">
+              📍 ایستگاه بعدی:
+              <span id="next-station-name">درحال محاسبه...</span><br />
+              فاصله: <span id="distance-val">0</span> کیلومتر | زمان رسیدن:
+              <span id="eta-val">--</span>
+            </div>
           </div>
         </div>
       </div>
@@ -136,10 +150,22 @@
             ⏰ چرخه زمان (ظهر)
           </button>
           <button
+            class="btn btn-orange"
+            id="btn-toggle-weather"
+          >
+            🌦️ فصل: تابستان
+          </button>
+          <button
             class="btn btn-purple"
             id="btn-change-style"
           >
             🔀 تعویض مدل قطار
+          </button>
+          <button
+            class="btn btn-cyan"
+            id="btn-horn"
+          >
+            📢 بوق (Space)
           </button>
         </div>
 

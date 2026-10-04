@@ -149,7 +149,9 @@ body {
     100% 100%
   );
   opacity: 0.6;
-  transition: filter 1.2s;
+  transition:
+    filter 1.2s,
+    background 1.2s;
 }
 .morning .mountain-layer {
   filter: brightness(0.8) sepia(0.2) hue-rotate(-20deg);
@@ -162,6 +164,12 @@ body {
 }
 .night .mountain-layer {
   filter: brightness(0.15) hue-rotate(40deg);
+}
+
+/* افکت برفی شدن کوه‌ها در زمستان */
+.mountain-layer.winter-mountains {
+  background: linear-gradient(135deg, #e2e8f0, #94a3b8) !important;
+  opacity: 0.85;
 }
 
 /* ریل قطار */
@@ -300,8 +308,7 @@ body {
   z-index: 10;
 }
 
-/* --- استایل‌های ۵ مدل قطار مدرن به صورت پویا --- */
-/* ۱. مگلو فوق کشیده */
+/* واگن‌ها و مدل‌ها */
 .train-maglev .wagon {
   width: 90px;
   height: 44px;
@@ -329,7 +336,6 @@ body {
   clip-path: polygon(0 0, 100% 50%, 75% 100%, 0 100%);
 }
 
-/* ۲. رترو متالیک سرخ */
 .train-retro .wagon {
   width: 85px;
   height: 46px;
@@ -357,7 +363,6 @@ body {
   border-radius: 2px;
 }
 
-/* ۳. نئون سایبرپانک */
 .train-cyber .wagon {
   width: 92px;
   height: 45px;
@@ -387,7 +392,6 @@ body {
   clip-path: polygon(0 0, 100% 100%, 0 100%);
 }
 
-/* ۴. مدل طلایی لوکس (Hyper Gold) */
 .train-gold .wagon {
   width: 90px;
   height: 44px;
@@ -415,7 +419,6 @@ body {
   border-radius: 4px 10px 0 0;
 }
 
-/* ۵. گلوله نقره‌ای شیک (Silver Bullet) */
 .train-silver .wagon {
   width: 88px;
   height: 45px;
@@ -443,7 +446,6 @@ body {
   clip-path: polygon(10% 0, 100% 30%, 90% 100%, 0 100%);
 }
 
-/* اجزای مشترک واگن‌ها */
 .wagon-windows {
   position: absolute;
   top: 8px;
@@ -505,7 +507,6 @@ body {
   box-shadow: 0 0 20px #f43f5e !important;
 }
 
-/* آدمک‌های ایستگاه */
 .person {
   width: 10px;
   height: 22px;
@@ -533,20 +534,26 @@ body {
   left: 15px;
   right: 15px;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 8px;
   z-index: 30;
   pointer-events: none;
 }
+.hud-row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
 .hud-panel {
   background: rgba(15, 23, 42, 0.9);
-  padding: 10px 20px;
+  padding: 10px 18px;
   border-radius: 12px;
   border: 1px solid #334155;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: bold;
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 15px;
   backdrop-filter: blur(6px);
 }
 .hud-panel span {
@@ -569,55 +576,42 @@ body {
   }
 }
 
-/* نوار کنترل پایین */
-#controls-bar {
+/* استایل اختصاصی سرعت سنج بالا وسط */
+.speedometer-panel {
+  background: radial-gradient(circle, #1e293b 0%, #0f172a 100%);
+  border: 2px solid #38bdf8;
+  padding: 5px 25px;
+  border-radius: 30px;
+  box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+  text-align: center;
+}
+.speedometer-panel div {
+  font-size: 10px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.speedometer-panel #speed-val {
+  font-size: 24px;
+  color: #38bdf8;
+  font-family: monospace;
+  font-weight: 900;
+}
+
+/* سیستم ذرات برف برای زمستان */
+.snowflake {
   position: absolute;
-  bottom: 15px;
-  left: 15px;
-  right: 15px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  z-index: 40;
+  top: -10px;
+  background: #fff;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0.75;
+  animation: fall linear infinite;
 }
-.control-group {
-  display: flex;
-  gap: 8px;
-}
-.btn {
-  padding: 11px 18px;
-  font-size: 13px;
-  font-weight: bold;
-  cursor: pointer;
-  border: none;
-  border-radius: 8px;
-  color: #fff;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-  transition: all 0.1s;
-}
-.btn-blue {
-  background-color: #0284c7;
-}
-.btn-red {
-  background-color: #dc2626;
-}
-.btn-green {
-  background-color: #16a34a;
-}
-.btn-dark {
-  background-color: #1e293b;
-  border: 1px solid #334155;
-}
-.btn-purple {
-  background-color: #7c3aed;
-}
-.btn-action {
-  background-color: #eab308;
-  color: #1e293b;
-  display: none;
-}
-.btn:active {
-  transform: scale(0.95);
+@keyframes fall {
+  to {
+    transform: translateY(500px) translateX(50px);
+  }
 }
 
 /* افکت پاپ آپ چندمنظوره */
@@ -638,6 +632,11 @@ body {
 .pop-loss {
   color: #f43f5e;
 }
+.pop-horn {
+  color: #06b6d4;
+  font-size: 24px;
+  text-shadow: 0 0 10px #06b6d4;
+}
 @keyframes popUp {
   0% {
     transform: translateY(0);
@@ -649,53 +648,74 @@ body {
   }
 }
 
-/* پرده خونین و پیام Game Over خطرناک */
-#game-over-screen {
+/* افکت شلیک و پاشش خون روی تصویر به صورت سینمایی بدون دکمه باخت */
+#blood-canvas {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(153, 27, 27, 0.9);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 200;
-  opacity: 0;
   pointer-events: none;
-  transition: opacity 0.5s ease;
-}
-#game-over-screen.active {
-  opacity: 1;
-  pointer-events: auto;
-}
-#game-over-screen h1 {
-  font-size: 45px;
-  color: #fff;
-  text-shadow: 0 4px 10px #000;
-  margin-bottom: 10px;
-}
-#game-over-screen p {
-  font-size: 20px;
-  color: #fecdd3;
-  font-weight: bold;
+  z-index: 150;
 }
 
-/* افکت فلاش پاشش خون */
-#blood-splatter {
+/* نوار کنترل پایین */
+#controls-bar {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(
-    circle,
-    rgba(220, 38, 38, 0.85) 0%,
-    rgba(127, 29, 29, 0.95) 100%
-  );
-  z-index: 199;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.1s ease;
+  bottom: 15px;
+  left: 15px;
+  right: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 40;
+}
+.control-group {
+  display: flex;
+  gap: 6px;
+}
+.btn {
+  padding: 10px 15px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  transition: all 0.1s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.btn-blue {
+  background-color: #0284c7;
+}
+.btn-red {
+  background-color: #dc2626;
+}
+.btn-green {
+  background-color: #16a34a;
+}
+.btn-dark {
+  background-color: #1e293b;
+  border: 1px solid #334155;
+}
+.btn-purple {
+  background-color: #7c3aed;
+}
+.btn-orange {
+  background-color: #f59e0b;
+}
+.btn-cyan {
+  background-color: #06b6d4;
+  color: #0f172a;
+}
+.btn-action {
+  background-color: #eab308;
+  color: #1e293b;
+  display: none;
+}
+.btn:active {
+  transform: scale(0.95);
 }
