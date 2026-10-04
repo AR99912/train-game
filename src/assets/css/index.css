@@ -13,9 +13,10 @@ body {
   height: 100vh;
   overflow: hidden;
   color: #fff;
+  user-select: none;
 }
 
-/* کانتینر اصلی بازی با انیمیشن تغییر وضعیت آسمان */
+/* کانتینر اصلی بازی */
 #game-container {
   position: relative;
   width: 950px;
@@ -41,6 +42,92 @@ body {
 }
 #game-container.night {
   background: linear-gradient(to bottom, #020205 0%, #0f172a 50%, #000000 100%);
+}
+
+/* خورشید، ماه و ابرها */
+.sky-element {
+  position: absolute;
+  transition:
+    all 1.2s ease,
+    transform 0.1s linear;
+  pointer-events: none;
+}
+#sun {
+  top: 40px;
+  left: 150px;
+  width: 60px;
+  height: 60px;
+  background: #ffb703;
+  border-radius: 50%;
+  box-shadow: 0 0 30px #ffb703;
+}
+#moon {
+  top: 40px;
+  left: 150px;
+  width: 50px;
+  height: 50px;
+  background: #f1f5f9;
+  border-radius: 50%;
+  box-shadow: 0 0 25px #f1f5f9;
+  opacity: 0;
+}
+
+/* تغییرات ظاهری منبع نور در آسمان */
+.morning #sun {
+  background: #fb8500;
+  box-shadow: 0 0 40px #fb8500;
+  transform: translateY(40px);
+}
+.noon #sun {
+  background: #fff;
+  box-shadow: 0 0 50px #fff;
+  transform: translateY(0);
+}
+.evening #sun {
+  background: #d00000;
+  box-shadow: 0 0 40px #d00000;
+  transform: translateY(60px);
+}
+.night #sun {
+  opacity: 0;
+}
+.night #moon {
+  opacity: 1;
+  transform: translateY(10px);
+}
+
+.cloud {
+  top: 60px;
+  width: 90px;
+  height: 30px;
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 20px;
+}
+.cloud::before,
+.cloud::after {
+  content: "";
+  position: absolute;
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 50%;
+}
+.cloud::before {
+  width: 45px;
+  height: 45px;
+  top: -20px;
+  left: 15px;
+}
+.cloud::after {
+  width: 35px;
+  height: 35px;
+  top: -15px;
+  right: 15px;
+}
+.night .cloud {
+  background: rgba(51, 65, 85, 0.4);
+}
+.night .cloud::before,
+.night .cloud::after {
+  background: rgba(51, 65, 85, 0.4);
 }
 
 /* لایه کوه‌ها متناسب با زمان */
@@ -153,7 +240,6 @@ body {
   background: rgba(254, 243, 199, 0.9);
   border-color: #d97706;
 }
-
 .station-sign {
   position: absolute;
   top: 12px;
@@ -214,8 +300,8 @@ body {
   z-index: 10;
 }
 
-/* --- استایل‌های پویا و رندوم قطار --- */
-/* ۱. استایل پیش‌فرض مگلو (نوک فوق‌العاده کشیده) */
+/* --- استایل‌های ۵ مدل قطار مدرن به صورت پویا --- */
+/* ۱. مگلو فوق کشیده */
 .train-maglev .wagon {
   width: 90px;
   height: 44px;
@@ -226,24 +312,24 @@ body {
   position: relative;
 }
 .train-maglev .locomotive {
-  width: 135px;
-  height: 44px; /* نوک خیلی کشیده */
+  width: 145px;
+  height: 44px;
   background: linear-gradient(to bottom, #f1f5f9 0%, #cbd5e1 100%);
-  border-radius: 4px 60px 12px 4px;
+  border-radius: 4px 70px 12px 4px;
   border-bottom: 4px solid #0284c7;
   position: relative;
 }
 .train-maglev .cabin {
   position: absolute;
   top: 6px;
-  right: 15px;
-  width: 45px;
-  height: 12px;
+  right: 20px;
+  width: 50px;
+  height: 11px;
   background: #0f172a;
   clip-path: polygon(0 0, 100% 50%, 75% 100%, 0 100%);
 }
 
-/* ۲. استایل پیکسلی (نوک کلاسیک آیرودینامیک سرخ) */
+/* ۲. رترو متالیک سرخ */
 .train-retro .wagon {
   width: 85px;
   height: 46px;
@@ -254,24 +340,24 @@ body {
   position: relative;
 }
 .train-retro .locomotive {
-  width: 105px;
+  width: 110px;
   height: 46px;
   background: linear-gradient(to bottom, #ef4444 0%, #991b1b 100%);
-  border-radius: 2px 25px 4px 2px;
+  border-radius: 2px 30px 4px 2px;
   border-bottom: 4px solid #f59e0b;
   position: relative;
 }
 .train-retro .cabin {
   position: absolute;
   top: 8px;
-  right: 8px;
-  width: 25px;
-  height: 16px;
+  right: 10px;
+  width: 30px;
+  height: 14px;
   background: #fff;
-  border: 2px solid #991b1b;
+  border-radius: 2px;
 }
 
-/* ۳. استایل سایبرپانک (نوک تهاجمی تیره نئونی) */
+/* ۳. نئون سایبرپانک */
 .train-cyber .wagon {
   width: 92px;
   height: 45px;
@@ -282,23 +368,79 @@ body {
   position: relative;
 }
 .train-cyber .locomotive {
-  width: 115px;
+  width: 120px;
   height: 45px;
   background: #1e1b4b;
   border: 1px solid #818cf8;
-  border-radius: 2px 40px 2px 2px;
+  border-radius: 2px 45px 2px 2px;
   border-bottom: 4px solid #06b6d4;
   position: relative;
 }
 .train-cyber .cabin {
   position: absolute;
   top: 5px;
-  right: 10px;
-  width: 35px;
+  right: 12px;
+  width: 38px;
   height: 14px;
   background: #06b6d4;
   box-shadow: 0 0 10px #06b6d4;
   clip-path: polygon(0 0, 100% 100%, 0 100%);
+}
+
+/* ۴. مدل طلایی لوکس (Hyper Gold) */
+.train-gold .wagon {
+  width: 90px;
+  height: 44px;
+  background: linear-gradient(to bottom, #fef08a 0%, #ca8a04 100%);
+  margin-right: 3px;
+  border-radius: 4px;
+  border-bottom: 4px solid #fff;
+  position: relative;
+}
+.train-gold .locomotive {
+  width: 125px;
+  height: 44px;
+  background: linear-gradient(to bottom, #fef08a 0%, #ca8a04 100%);
+  border-radius: 4px 50px 8px 4px;
+  border-bottom: 4px solid #fff;
+  position: relative;
+}
+.train-gold .cabin {
+  position: absolute;
+  top: 6px;
+  right: 12px;
+  width: 40px;
+  height: 12px;
+  background: #1e293b;
+  border-radius: 4px 10px 0 0;
+}
+
+/* ۵. گلوله نقره‌ای شیک (Silver Bullet) */
+.train-silver .wagon {
+  width: 88px;
+  height: 45px;
+  background: linear-gradient(to bottom, #ffffff 0%, #94a3b8 100%);
+  margin-right: 3px;
+  border-radius: 20px 4px 4px 20px;
+  border-bottom: 4px solid #475569;
+  position: relative;
+}
+.train-silver .locomotive {
+  width: 130px;
+  height: 45px;
+  background: linear-gradient(to bottom, #ffffff 0%, #94a3b8 100%);
+  border-radius: 4px 60px 20px 4px;
+  border-bottom: 4px solid #1e293b;
+  position: relative;
+}
+.train-silver .cabin {
+  position: absolute;
+  top: 7px;
+  right: 15px;
+  width: 35px;
+  height: 12px;
+  background: #334155;
+  clip-path: polygon(10% 0, 100% 30%, 90% 100%, 0 100%);
 }
 
 /* اجزای مشترک واگن‌ها */
@@ -353,7 +495,6 @@ body {
   border-radius: 50%;
 }
 
-/* روشن شدن هوشمند چراغ در عصر و شب */
 .night .headlight,
 .evening .headlight {
   background: #22c55e;
@@ -413,7 +554,7 @@ body {
 }
 #coin-val {
   color: #f59e0b !important;
-} /* رنگ طلایی سکه */
+}
 #station-alert {
   color: #ef4444 !important;
   animation: blink 0.6s infinite alternate;
@@ -479,7 +620,7 @@ body {
   transform: scale(0.95);
 }
 
-/* پاپ آپ‌های شناور انیمیشنی امتیاز و سکه */
+/* افکت پاپ آپ چندمنظوره */
 .pop-effect {
   position: absolute;
   font-weight: bold;
@@ -492,8 +633,10 @@ body {
   color: #22c55e;
 }
 .pop-coin {
-  color: #fb3b1e;
   color: #f59e0b;
+}
+.pop-loss {
+  color: #f43f5e;
 }
 @keyframes popUp {
   0% {
@@ -504,4 +647,55 @@ body {
     transform: translateY(-50px);
     opacity: 0;
   }
+}
+
+/* پرده خونین و پیام Game Over خطرناک */
+#game-over-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(153, 27, 27, 0.9);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+#game-over-screen.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+#game-over-screen h1 {
+  font-size: 45px;
+  color: #fff;
+  text-shadow: 0 4px 10px #000;
+  margin-bottom: 10px;
+}
+#game-over-screen p {
+  font-size: 20px;
+  color: #fecdd3;
+  font-weight: bold;
+}
+
+/* افکت فلاش پاشش خون */
+#blood-splatter {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle,
+    rgba(220, 38, 38, 0.85) 0%,
+    rgba(127, 29, 29, 0.95) 100%
+  );
+  z-index: 199;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.1s ease;
 }

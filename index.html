@@ -22,7 +22,31 @@
       id="game-container"
       class="noon"
     >
-      <!-- پنل کاربری HUD -->
+      <div
+        id="sun"
+        class="sky-element"
+      ></div>
+      <div
+        id="moon"
+        class="sky-element"
+      ></div>
+      <div
+        id="cloud1"
+        class="sky-element cloud"
+        style="left: 100px; transform: scale(0.8)"
+      ></div>
+      <div
+        id="cloud2"
+        class="sky-element cloud"
+        style="left: 500px; transform: scale(0.6); top: 40px"
+      ></div>
+
+      <div id="game-over-screen">
+        <h1>🩸 فاجعه رو ریل!</h1>
+        <p>تو یک موجود زنده رو کشتی! بازی کلاً ریست میشه...</p>
+      </div>
+      <div id="blood-splatter"></div>
+
       <div id="hud">
         <div class="hud-panel">
           <div>امتیاز: <span id="score-val">0</span></div>
@@ -37,7 +61,6 @@
         </div>
       </div>
 
-      <!-- لایه‌های گرافیکی مپ -->
       <div
         class="mountain-layer"
         id="mountains"
@@ -47,17 +70,14 @@
         id="scenery-layer"
       ></div>
 
-      <!-- ریل -->
       <div id="railway-container">
         <div id="railway"></div>
       </div>
 
-      <!-- کانتینر اصلی قطار (کلاس استایل پیشفرض مگلو است) -->
       <div
         id="train-group"
         class="train-maglev"
       >
-        <!-- ۵ واگن مدرن -->
         <div class="wagon">
           <div class="wagon-windows"></div>
           <div class="wheel-pair">
@@ -93,7 +113,6 @@
             <div class="wheel"></div>
           </div>
         </div>
-        <!-- لوکوموتیو -->
         <div class="locomotive">
           <div class="cabin"></div>
           <div class="headlight"></div>
@@ -108,7 +127,6 @@
         </div>
       </div>
 
-      <!-- دکمه‌های مدیریتی بازی -->
       <div id="controls-bar">
         <div class="control-group">
           <button
