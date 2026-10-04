@@ -30,6 +30,12 @@ body {
     filter 1.2s ease;
 }
 
+/* افکت فلاش رعد و برق برای بهار */
+#game-container.lightning-flash {
+  filter: brightness(2.5) contrast(1.2);
+  background: #fff !important;
+}
+
 /* ۴ حالت آسمان محیط */
 #game-container.morning {
   background: linear-gradient(to bottom, #ff9a9e 0%, #fecfef 40%, #a1c4fd 100%);
@@ -72,7 +78,6 @@ body {
   opacity: 0;
 }
 
-/* تغییرات ظاهری منبع نور در آسمان */
 .morning #sun {
   background: #fb8500;
   box-shadow: 0 0 40px #fb8500;
@@ -130,29 +135,75 @@ body {
   background: rgba(51, 65, 85, 0.4);
 }
 
-/* لایه کوه‌ها متناسب با زمان */
-.mountain-layer {
+/* لایه‌های کوهستان دوقلو (برای افکت برف زمستانی واقعی 🏔️) */
+.mountain-container {
   position: absolute;
   bottom: 95px;
   width: 200%;
   height: 180px;
+  pointer-events: none;
+}
+.mountain-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background: linear-gradient(135deg, #2c3e50, #34495e);
   clip-path: polygon(
     0% 100%,
-    10% 20%,
-    25% 60%,
-    40% 15%,
-    55% 65%,
-    70% 10%,
-    85% 55%,
-    100% 20%,
+    12% 18%,
+    28% 63%,
+    43% 12%,
+    58% 68%,
+    72% 8%,
+    86% 59%,
+    100% 18%,
     100% 100%
   );
-  opacity: 0.6;
+  opacity: 0.7;
   transition:
     filter 1.2s,
     background 1.2s;
 }
+.mountain-snow-caps {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, #ffffff 0%, #cbd5e1 100%);
+  /* فقط قله‌ها را برش می‌زند */
+  clip-path: polygon(
+    12% 18%,
+    9% 30%,
+    11% 28%,
+    13% 32%,
+    15% 26%,
+    17% 30%,
+    14% 28%,
+    12% 18%,
+    43% 12%,
+    40% 25%,
+    42% 23%,
+    44% 27%,
+    45% 22%,
+    47% 26%,
+    44% 23%,
+    43% 12%,
+    72% 8%,
+    69% 22%,
+    71% 20%,
+    73% 25%,
+    74% 19%,
+    76% 23%,
+    73% 20%,
+    72% 8%
+  );
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
 .morning .mountain-layer {
   filter: brightness(0.8) sepia(0.2) hue-rotate(-20deg);
 }
@@ -164,12 +215,6 @@ body {
 }
 .night .mountain-layer {
   filter: brightness(0.15) hue-rotate(40deg);
-}
-
-/* افکت برفی شدن کوه‌ها در زمستان */
-.mountain-layer.winter-mountains {
-  background: linear-gradient(135deg, #e2e8f0, #94a3b8) !important;
-  opacity: 0.85;
 }
 
 /* ریل قطار */
@@ -598,20 +643,11 @@ body {
   font-weight: 900;
 }
 
-/* سیستم ذرات برف برای زمستان */
-.snowflake {
+/* المان‌های پویای آب و هوا بر روی بوم پیش‌فرض متصل به ذرات */
+.weather-particle {
   position: absolute;
-  top: -10px;
-  background: #fff;
-  border-radius: 50%;
   pointer-events: none;
-  opacity: 0.75;
-  animation: fall linear infinite;
-}
-@keyframes fall {
-  to {
-    transform: translateY(500px) translateX(50px);
-  }
+  opacity: 0.8;
 }
 
 /* افکت پاپ آپ چندمنظوره */
@@ -648,7 +684,7 @@ body {
   }
 }
 
-/* افکت شلیک و پاشش خون روی تصویر به صورت سینمایی بدون دکمه باخت */
+/* افکت شلیک و پاشش خون روی تصویر به صورت سینمایی فوق العاده متراکم */
 #blood-canvas {
   position: absolute;
   top: 0;

@@ -1,5 +1,7 @@
 const sceneryLayer = document.getElementById("scenery-layer");
+const mountainBox = document.getElementById("mountain-box");
 const mountains = document.getElementById("mountains");
+const mountainCaps = document.getElementById("mountain-caps");
 const railway = document.getElementById("railway");
 const speedVal = document.getElementById("speed-val");
 const scoreVal = document.getElementById("score-val");
@@ -16,30 +18,26 @@ const wagons = document.querySelectorAll(".wagon-windows");
 const bloodCanvas = document.getElementById("blood-canvas");
 const ctx = bloodCanvas.getContext("2d");
 
-// ابرها برای تحرک هوشمند
 const cloud1 = document.getElementById("cloud1");
 const cloud2 = document.getElementById("cloud2");
 let cloud1X = 100,
   cloud2X = 500;
 
-// وب آدیو برای شبیه‌سازی صدای بوق (بیب بیب) کاملاً بومی بدون فایل خارجی
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 function playHornSound() {
   try {
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
     osc.type = "square";
-    osc.frequency.setValueAtTime(440, audioCtx.currentTime); // فرکانس صدا
+    osc.frequency.setValueAtTime(440, audioCtx.currentTime);
     osc.connect(gain);
     gain.connect(audioCtx.destination);
     gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
     osc.start();
-    // تولید حالت بیب بیب مقطع کوتاه
     setTimeout(() => osc.stop(), 150);
   } catch (e) {}
 }
 
-// فیزیک حرکت
 document.getElementById("btn-fast").addEventListener("click", () => {
   targetSpeed = Math.min(maxSpeed, targetSpeed + 3.5);
 });
@@ -50,7 +48,6 @@ document.getElementById("btn-stop").addEventListener("click", () => {
   targetSpeed = 0;
 });
 
-// چرخه زمان ۴ حالته
 const times = ["morning", "noon", "evening", "night"];
 const timeLabels = {
   morning: "صبح🌅",
@@ -68,7 +65,7 @@ btnTime.addEventListener("click", () => {
   btnTime.innerText = `⏰ چرخه زمان (${timeLabels[newTime]})`;
 });
 
-// سیستم آب و هوای هوشمند ۴ فصل
+// سیستم پیشرفته جلوه‌های ۴ فصل
 const seasons = ["summer", "autumn", "winter", "spring"];
 const seasonLabels = {
   summer: "تابستان☀️",
@@ -77,41 +74,150 @@ const seasonLabels = {
   spring: "بهار🌸",
 };
 let currentSeasonIndex = 0;
-let snowParticles = [];
+let weatherParticles = [];
+let lightningTimer = 0;
 
 btnWeather.addEventListener("click", () => {
   currentSeasonIndex = (currentSeasonIndex + 1) % seasons.length;
   let currentSeason = seasons[currentSeasonIndex];
   btnWeather.innerText = `🌦️ فصل: ${seasonLabels[currentSeason]}`;
 
+  // مدیریت پوشش برف کوه‌ها متناسب با زمستان 🏔️
   if (currentSeason === "winter") {
-    mountains.classList.add("winter-mountains");
-    initSnow();
+    mountainCaps.style.opacity = "1";
   } else {
-    mountains.classList.remove("winter-mountains");
-    clearSnow();
+    mountainCaps.style.opacity = "0";
   }
+  initWeatherFX(currentSeason);
 });
 
-function initSnow() {
-  clearSnow();
-  for (let i = 0; i < 40; i++) {
-    let flake = document.createElement("div");
-    flake.className = "snowflake";
-    flake.style.left = Math.random() * 950 + "px";
-    flake.style.width = flake.style.height = Math.random() * 4 + 2 + "px";
-    flake.style.animationDuration = Math.random() * 3 + 2 + "s";
-    flake.style.animationDelay = Math.random() * 2 + "s";
-    gameContainer.appendChild(flake);
-    snowParticles.push(flake);
+function initWeatherFX(season) {
+  weatherParticles.forEach((p) => p.element.remove());
+  weatherParticles = [];
+  gameContainer.classList.remove("lightning-flash");
+
+  let count = 0;
+  if (season === "winter")
+    count = 45; // دانه برف
+  else if (season === "spring")
+    count = 50; // باران شدید
+  else if (season === "autumn")
+    count = 35; // باران + برگ پاییزی
+  else if (season === "summer") count = 12; // خطوط وزش باد
+
+  for (let i = 0; i < count; i++) {
+    let p = document.createElement("div");
+    p.className = "weather-particle";
+
+    let pObj = {
+      element: p,
+      type: season,
+      x: Math.random() * 950,
+      y: Math.random() * 480,
+      speedY: 0,
+      speedX: 0,
+    };
+
+    if (season === "winter") {
+      p.style.background = "#fff";
+      p.style.borderRadius = "50%";
+      let size = Math.random() * 4 + 2;
+      p.style.width = size + "px";
+      p.style.height = size + "px";
+      pObj.speedY = Math.random() * 1.5 + 1;
+      pObj.speedX = Math.random() * 0.8 - 0.2;
+    } else if (season === "spring") {
+      p.style.background = "linear-gradient(to bottom, transparent, #93c5fd)";
+      p.style.width = "2px";
+      p.style.height = Math.random() * 18 + 12 + "px";
+      p.style.transform = "rotate(-15deg)";
+      pObj.speedY = Math.random() * 8 + 7;
+      pObj.speedX = -2;
+    } else if (season === "autumn") {
+      if (Math.random() > 0.4) {
+        // قطرات باران پاییز
+        p.style.background =
+          "linear-gradient(to bottom, transparent, rgba(148,163,184,0.6))";
+        p.style.width = "1.5px";
+        p.style.height = "14px";
+        pObj.speedY = Math.random() * 5 + 5;
+        pObj.speedX = -0.5;
+      } else {
+        // برگ‌های ریز پاییزی
+        let colors = ["#f97316", "#eab308", "#ca8a04", "#b45309"];
+        p.style.background = colors[Math.floor(Math.random() * colors.length)];
+        p.style.borderRadius = "2px 8px 2px 8px";
+        let size = Math.random() * 5 + 4;
+        p.style.width = size + "px";
+        p.style.height = size - 1 + "px";
+        p.style.transform = `rotate(${Math.random() * 360}deg)`;
+        pObj.speedY = Math.random() * 1.2 + 0.8;
+        pObj.speedX = Math.random() * 1.5 + 1; // حرکت رقصان همراه با باد
+      }
+    } else if (season === "summer") {
+      // افکت خطوط افقی جریان هوای داغ
+      p.style.background =
+        "linear-gradient(to right, transparent, rgba(255,255,255,0.18), transparent)";
+      p.style.width = Math.random() * 90 + 60 + "px";
+      p.style.height = "1.5px";
+      pObj.speedY = 0;
+      pObj.speedX = -(Math.random() * 6 + 10); // حرکت بسیار سریع افقی به چپ
+    }
+
+    p.style.left = pObj.x + "px";
+    p.style.top = pObj.y + "px";
+    gameContainer.appendChild(p);
+    weatherParticles.push(pObj);
   }
 }
-function clearSnow() {
-  snowParticles.forEach((p) => p.remove());
-  snowParticles = [];
+
+function updateWeatherFX() {
+  let currentSeason = seasons[currentSeasonIndex];
+
+  // شبیه‌سازی مکانیزم رعد و برق اختصاصی بهار ⚡
+  if (currentSeason === "spring") {
+    lightningTimer++;
+    if (lightningTimer > 160) {
+      if (Math.random() > 0.97) {
+        gameContainer.classList.add("lightning-flash");
+        setTimeout(() => gameContainer.classList.remove("lightning-flash"), 60);
+        setTimeout(() => {
+          if (Math.random() > 0.5) {
+            gameContainer.classList.add("lightning-flash");
+            setTimeout(
+              () => gameContainer.classList.remove("lightning-flash"),
+              40,
+            );
+          }
+        }, 150);
+        lightningTimer = 0;
+      }
+    }
+  }
+
+  weatherParticles.forEach((p) => {
+    p.y += p.speedY;
+    p.x += p.speedX;
+
+    // مدیریت فیزیک برخورد و برگشت ذرات به کادر بازی
+    if (p.y > 480) {
+      p.y = -20;
+      p.x = Math.random() * 950;
+    }
+    if (p.x < -100) {
+      p.x = 960;
+      p.y = Math.random() * 480;
+    }
+    if (p.x > 960) {
+      p.x = -90;
+      p.y = Math.random() * 480;
+    }
+
+    p.element.style.top = p.y + "px";
+    p.element.style.left = p.x + "px";
+  });
 }
 
-// عملکرد بوق زدن
 function triggerHorn() {
   playHornSound();
   createPopEffect("🔊 بیب بیب!", 600, 200, "pop-horn");
@@ -124,7 +230,6 @@ window.addEventListener("keydown", (e) => {
   }
 });
 
-// سوییچ رندوم بین ۵ استایل قطار مدرن
 const trainStyles = [
   "train-maglev",
   "train-retro",
@@ -143,7 +248,6 @@ document.getElementById("btn-change-style").addEventListener("click", () => {
   trainGroup.classList.add(trainStyles[currentStyleIndex]);
 });
 
-// مدیریت رفع مانع
 btnClearObstacle.addEventListener("click", () => {
   if (activeObstacleIndex !== null) {
     elements[activeObstacleIndex].active = false;
@@ -157,7 +261,6 @@ btnClearObstacle.addEventListener("click", () => {
   }
 });
 
-// مقادیر پایه وضعیت بازی
 let speed = 0,
   targetSpeed = 0,
   maxSpeed = 15;
@@ -266,43 +369,65 @@ function createPopEffect(text, x, y, className) {
   setTimeout(() => pop.remove(), 900);
 }
 
-// افکت جذاب پاشیدن لکه‌های خون تصادفی رو تصویر (بدون گیم اور شدن)
+// سیستم مدیریت افکت پاشش قطرات خون غلیظ و اقماری با ابعاد بزرگ‌تر 🩸
 function splatterBloodEffect() {
-  createPopEffect("💥 برخورد کردی!", 550, 180, "pop-loss");
-  // تولید ۱۰ لکه خون تصادفی در کادر تصویر
-  for (let i = 0; i < 12; i++) {
+  createPopEffect("💥 برخورد شدید!", 550, 180, "pop-loss");
+
+  // افزایش چشمگیر تعداد ذرات اصلی به ۳۵ لکه
+  for (let i = 0; i < 35; i++) {
+    // تمرکز پاشش اولیه در لبه‌های جلویی حرکت قطار و پخش تصادفی در کل کادر
+    let baseLinesX = 500 + Math.random() * 450;
+    bloodSpots.push({
+      x: Math.random() > 0.4 ? baseLinesX : Math.random() * bloodCanvas.width,
+      y: Math.random() * bloodCanvas.height,
+      radius: Math.random() * 38 + 12, // ابعاد بزرگتر لکه‌های اصلی
+      alpha: 1.0,
+      type: "drop",
+    });
+  }
+
+  // اضافه کردن ۴۰ لکه فرعی اقماری بسیار ریز جهت حس پاشش داینامیک مایع بر شیشه دوربین
+  for (let j = 0; j < 40; j++) {
     bloodSpots.push({
       x: Math.random() * bloodCanvas.width,
       y: Math.random() * bloodCanvas.height,
-      radius: Math.random() * 25 + 8,
-      alpha: 0.9,
+      radius: Math.random() * 6 + 2,
+      alpha: 0.85,
+      type: "spray",
     });
   }
 }
 
-// رندر و محو شدن تدریجی لکه‌های خون روی بوم
 function drawBloodSplatter() {
   ctx.clearRect(0, 0, bloodCanvas.width, bloodCanvas.height);
   for (let i = bloodSpots.length - 1; i >= 0; i--) {
     let spot = bloodSpots[i];
     ctx.beginPath();
-    ctx.fillStyle = `rgba(185, 28, 28, ${spot.alpha})`;
-    ctx.arc(spot.x, spot.y, spot.radius, 0, Math.PI * 2);
-    ctx.fill();
 
-    // افزودن چند قطره کوچک اطراف لکه اصلی برای طبیعی تر شدن
-    ctx.beginPath();
-    ctx.fillStyle = `rgba(153, 27, 27, ${spot.alpha * 0.8})`;
-    ctx.arc(
-      spot.x + spot.radius * 0.5,
-      spot.y + spot.radius * 0.4,
-      spot.radius * 0.3,
-      0,
-      Math.PI * 2,
-    );
-    ctx.fill();
+    if (spot.type === "drop") {
+      ctx.fillStyle = `rgba(153, 27, 27, ${spot.alpha})`; // قرمز تیره و غلیظ متراکم
+      ctx.arc(spot.x, spot.y, spot.radius, 0, Math.PI * 2);
+      ctx.fill();
 
-    spot.alpha -= 0.004; // سرعت محو شدن لکه‌ها
+      // سایه اقماری جانبی متصل به لکه اصلی
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(185, 28, 28, ${spot.alpha * 0.85})`;
+      ctx.arc(
+        spot.x + spot.radius * 0.4,
+        spot.y + spot.radius * 0.3,
+        spot.radius * 0.4,
+        0,
+        Math.PI * 2,
+      );
+      ctx.fill();
+    } else {
+      // رندر ذرات اقماری ریز پاشیده شده
+      ctx.fillStyle = `rgba(127, 29, 29, ${spot.alpha})`;
+      ctx.arc(spot.x, spot.y, spot.radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    spot.alpha -= 0.0025; // کاهش سرعت محو شدن لکه‌ها برای ماندگاری طولانی‌تر حس سینمایی
     if (spot.alpha <= 0) {
       bloodSpots.splice(i, 1);
     }
@@ -318,6 +443,7 @@ function gameLoop() {
   speedVal.innerText = currentDisplaySpeed;
 
   drawBloodSplatter();
+  updateWeatherFX(); // موتور پویای ذرات آب و هوا
 
   if (speed > 0.1) {
     wheelRotation += speed * 3;
@@ -331,7 +457,7 @@ function gameLoop() {
 
     mountPosX -= speed * 0.12;
     if (mountPosX <= -950) mountPosX = 0;
-    mountMountains(mountPosX);
+    mountainBox.style.transform = `translateX(${mountPosX}px)`;
 
     cloud1X -= speed * 0.2;
     if (cloud1X < -150) cloud1X = 1000;
@@ -344,7 +470,6 @@ function gameLoop() {
   let trainFrontX = 60 + 6 * 95;
   let showAlert = false;
 
-  // پیدا کردن نزدیک‌ترین ایستگاه پیش‌رو برای محاسبه کیلومتر و زمان
   let nextStation = null;
   elements.forEach((el) => {
     if (el.type === "station" && el.x - trainFrontX > -100) {
@@ -356,14 +481,12 @@ function gameLoop() {
 
   if (nextStation) {
     document.getElementById("next-station-name").innerText = nextStation.name;
-    // فرمول تبدیل لوکال مختصات به کیلومتر فرضی بازی
     let distanceKm = Math.max(
       0,
       ((nextStation.x - trainFrontX) / 100).toFixed(1),
     );
     document.getElementById("distance-val").innerText = distanceKm;
 
-    // محاسبه زمان باقی مانده بر اساس سرعت لحظه‌ای: T = D / V
     if (currentDisplaySpeed > 0) {
       let etaSeconds = Math.round((distanceKm / currentDisplaySpeed) * 3600);
       if (etaSeconds > 60) {
@@ -470,11 +593,9 @@ function gameLoop() {
         btnClearObstacle.style.display = "block";
       }
 
-      // تلاقی و تصادف قطار با مانع جاندار یا بی‌جان
       if (distanceToObstacle > -10 && distanceToObstacle < 30) {
         if (speed > 1) {
           if (el.info.isLiving) {
-            // طبق ایده جدید شما: پاشیدن خون روی تصویر بدون گیم اور یا ریست شدن بازی!
             splatterBloodEffect();
             score = Math.max(0, score - 80);
             scoreVal.innerText = score;
@@ -503,12 +624,8 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 
-function mountMountains(pos) {
-  mountains.style.transform = `translateX(${pos}px)`;
-}
-
-// استارت اولیه بازی
 resetMapData();
 createMapElements();
 updateWagonPassengers();
+initWeatherFX("summer"); // لود اولیه افکت تابستانی بازی
 gameLoop();
