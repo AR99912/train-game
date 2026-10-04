@@ -5,7 +5,7 @@
 }
 
 body {
-  background-color: #111217;
+  background-color: #0b0c10;
   font-family: "Segoe UI", Tahoma, sans-serif;
   display: flex;
   justify-content: center;
@@ -13,42 +13,37 @@ body {
   height: 100vh;
   overflow: hidden;
   color: #fff;
-  transition: background 0.5s;
 }
 
-/* کانتینر بازی با قابلیت وضعیت شب و روز */
+/* کانتینر اصلی بازی با انیمیشن تغییر وضعیت آسمان */
 #game-container {
   position: relative;
   width: 950px;
   height: 480px;
-  background: linear-gradient(
-    to bottom,
-    #1b263b 0%,
-    #415a77 50%,
-    #778da9 80%,
-    #e0e1dd 100%
-  );
   overflow: hidden;
-  border: 6px solid #222;
+  border: 6px solid #1f2833;
   border-radius: 16px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
   transition:
-    background 1s,
-    filter 1s;
+    background 1.2s ease,
+    filter 1.2s ease;
 }
 
-/* تم شب */
+/* ۴ حالت آسمان محیط */
+#game-container.morning {
+  background: linear-gradient(to bottom, #ff9a9e 0%, #fecfef 40%, #a1c4fd 100%);
+}
+#game-container.noon {
+  background: linear-gradient(to bottom, #00b4db 0%, #0083b0 60%, #e0e1dd 100%);
+}
+#game-container.evening {
+  background: linear-gradient(to bottom, #f12711 0%, #f5af19 50%, #e29578 100%);
+}
 #game-container.night {
-  background: linear-gradient(
-    to bottom,
-    #03071e 0%,
-    #370617 40%,
-    #6a040f 70%,
-    #000000 100%
-  );
+  background: linear-gradient(to bottom, #020205 0%, #0f172a 50%, #000000 100%);
 }
 
-/* لایه کوه‌ها */
+/* لایه کوه‌ها متناسب با زمان */
 .mountain-layer {
   position: absolute;
   bottom: 95px;
@@ -66,31 +61,37 @@ body {
     100% 20%,
     100% 100%
   );
-  opacity: 0.5;
-  transition: filter 1s;
+  opacity: 0.6;
+  transition: filter 1.2s;
+}
+.morning .mountain-layer {
+  filter: brightness(0.8) sepia(0.2) hue-rotate(-20deg);
+}
+.noon .mountain-layer {
+  filter: brightness(0.6);
+}
+.evening .mountain-layer {
+  filter: brightness(0.5) sepia(0.5) hue-rotate(10deg);
 }
 .night .mountain-layer {
-  filter: brightness(0.3) hue-rotate(50deg);
+  filter: brightness(0.15) hue-rotate(40deg);
 }
 
-/* ریل قطار مدرن */
+/* ریل قطار */
 #railway-container {
   position: absolute;
   bottom: 0;
   width: 100%;
   height: 100px;
-  background-color: #2b2b2b;
+  background-color: #222;
 }
-
 #railway {
   position: absolute;
   top: 15px;
   width: 200%;
   height: 6px;
-  background-color: #b8bfc2;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  background-color: #94a3b8;
 }
-
 #railway::before {
   content: "";
   position: absolute;
@@ -99,8 +100,8 @@ body {
   height: 8px;
   background: repeating-linear-gradient(
     90deg,
-    #555,
-    #555 15px,
+    #444,
+    #444 15px,
     transparent 15px,
     transparent 35px
   );
@@ -114,17 +115,20 @@ body {
   height: 200px;
   pointer-events: none;
 }
-
 .tree {
   position: absolute;
   bottom: 0;
-  width: 30px;
+  width: 32px;
   height: 75px;
-  background-color: #134e4a;
+  background-color: #064e3b;
   border-radius: 50% 50% 0 0;
+  transition: filter 1.2s;
 }
 .night .tree {
-  filter: brightness(0.4);
+  filter: brightness(0.2);
+}
+.evening .tree {
+  filter: brightness(0.6) sepia(0.3);
 }
 
 /* ایستگاه مدرن */
@@ -132,23 +136,30 @@ body {
   position: absolute;
   bottom: 0;
   width: 240px;
-  height: 120px;
-  background: rgba(230, 242, 255, 0.9);
-  border: 2px solid #0077b6;
+  height: 125px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid #0284c7;
   border-radius: 12px 12px 0 0;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition:
+    background 1.2s,
+    border-color 1.2s;
 }
 .night .station {
-  background: rgba(20, 35, 55, 0.9);
-  border-color: #00f5d4;
-  box-shadow: 0 0 20px rgba(0, 245, 212, 0.3);
+  background: rgba(15, 23, 42, 0.95);
+  border-color: #06b6d4;
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
 }
+.evening .station {
+  background: rgba(254, 243, 199, 0.9);
+  border-color: #d97706;
+}
+
 .station-sign {
   position: absolute;
   top: 12px;
   left: 50%;
   transform: translateX(-50%);
-  background: #0077b6;
+  background: #0284c7;
   color: #fff;
   padding: 4px 18px;
   font-weight: bold;
@@ -156,10 +167,9 @@ body {
   border-radius: 20px;
 }
 .night .station-sign {
-  background: #00f5d4;
-  color: #111;
+  background: #06b6d4;
+  color: #0f172a;
 }
-
 .station-passengers {
   position: absolute;
   bottom: 5px;
@@ -168,7 +178,7 @@ body {
   gap: 6px;
 }
 
-/* سیستم موانع جدید و متنوع */
+/* سیستم موانع */
 .obstacle {
   position: absolute;
   bottom: 0;
@@ -178,7 +188,6 @@ body {
   justify-content: center;
   align-items: center;
   font-size: 28px;
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
   transition: transform 0.2s;
 }
 .obstacle.laser-hit {
@@ -187,7 +196,7 @@ body {
 @keyframes explode {
   0% {
     transform: scale(1);
-    filter: brightness(3) blure(0);
+    filter: brightness(3);
   }
   100% {
     transform: scale(0);
@@ -195,7 +204,7 @@ body {
   }
 }
 
-/* قطار سریع‌السیر امروزی (Bullet Train) */
+/* کانتینر گروه قطار */
 #train-group {
   position: absolute;
   bottom: 74px;
@@ -205,39 +214,117 @@ body {
   z-index: 10;
 }
 
-/* واگن‌های آیرودینامیک مدرن */
-.wagon {
+/* --- استایل‌های پویا و رندوم قطار --- */
+/* ۱. استایل پیش‌فرض مگلو (نوک فوق‌العاده کشیده) */
+.train-maglev .wagon {
   width: 90px;
-  height: 46px;
-  background: linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 50%, #dee2e6 100%);
+  height: 44px;
+  background: linear-gradient(to bottom, #f1f5f9 0%, #cbd5e1 100%);
   margin-right: 3px;
   border-radius: 4px;
+  border-bottom: 4px solid #0284c7;
   position: relative;
-  border: 1px solid #adb5bd;
-  border-bottom: 4px solid #0077b6; /* خط آبی رنگ قطارهای سریع السیر */
+}
+.train-maglev .locomotive {
+  width: 135px;
+  height: 44px; /* نوک خیلی کشیده */
+  background: linear-gradient(to bottom, #f1f5f9 0%, #cbd5e1 100%);
+  border-radius: 4px 60px 12px 4px;
+  border-bottom: 4px solid #0284c7;
+  position: relative;
+}
+.train-maglev .cabin {
+  position: absolute;
+  top: 6px;
+  right: 15px;
+  width: 45px;
+  height: 12px;
+  background: #0f172a;
+  clip-path: polygon(0 0, 100% 50%, 75% 100%, 0 100%);
 }
 
+/* ۲. استایل پیکسلی (نوک کلاسیک آیرودینامیک سرخ) */
+.train-retro .wagon {
+  width: 85px;
+  height: 46px;
+  background: linear-gradient(to bottom, #ef4444 0%, #991b1b 100%);
+  margin-right: 4px;
+  border-radius: 2px;
+  border-bottom: 4px solid #f59e0b;
+  position: relative;
+}
+.train-retro .locomotive {
+  width: 105px;
+  height: 46px;
+  background: linear-gradient(to bottom, #ef4444 0%, #991b1b 100%);
+  border-radius: 2px 25px 4px 2px;
+  border-bottom: 4px solid #f59e0b;
+  position: relative;
+}
+.train-retro .cabin {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 25px;
+  height: 16px;
+  background: #fff;
+  border: 2px solid #991b1b;
+}
+
+/* ۳. استایل سایبرپانک (نوک تهاجمی تیره نئونی) */
+.train-cyber .wagon {
+  width: 92px;
+  height: 45px;
+  background: #1e1b4b;
+  margin-right: 2px;
+  border: 1px solid #818cf8;
+  border-bottom: 4px solid #a855f7;
+  position: relative;
+}
+.train-cyber .locomotive {
+  width: 115px;
+  height: 45px;
+  background: #1e1b4b;
+  border: 1px solid #818cf8;
+  border-radius: 2px 40px 2px 2px;
+  border-bottom: 4px solid #06b6d4;
+  position: relative;
+}
+.train-cyber .cabin {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  width: 35px;
+  height: 14px;
+  background: #06b6d4;
+  box-shadow: 0 0 10px #06b6d4;
+  clip-path: polygon(0 0, 100% 100%, 0 100%);
+}
+
+/* اجزای مشترک واگن‌ها */
 .wagon-windows {
   position: absolute;
   top: 8px;
   left: 5px;
   right: 5px;
   height: 12px;
-  background: #212529; /* شیشه دودی یکپارچه مدرن */
+  background: #0f172a;
   border-radius: 2px;
   display: flex;
   justify-content: space-around;
   align-items: flex-end;
   overflow: hidden;
 }
-
+.train-cyber .wagon-windows {
+  background: #000;
+  border: 1px solid #a855f7;
+}
 .passenger-head {
   width: 8px;
   height: 8px;
-  background: #ffb703;
+  background: #fbbf24;
   border-radius: 50%;
   display: inline-block;
-  opacity: 0.8;
 }
 
 .wheel-pair {
@@ -251,46 +338,30 @@ body {
 .wheel {
   width: 12px;
   height: 12px;
-  background: #333;
-  border: 2px solid #aaa;
+  background: #1e293b;
+  border: 2px solid #94a3b8;
   border-radius: 50%;
 }
-
-/* لوکوموتیو مغناطیسی سریع‌السیر با دماغه کشیده */
-.locomotive {
-  width: 120px;
-  height: 46px;
-  background: linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 50%, #dee2e6 100%);
-  border-radius: 4px 35px 8px 4px; /* شکل آیرودینامیک جلو */
-  position: relative;
-  border: 1px solid #adb5bd;
-  border-bottom: 4px solid #0077b6;
-}
-/* شیشه جلوی راننده کشیده */
-.locomotive .cabin {
+.headlight {
   position: absolute;
-  top: 6px;
-  right: 8px;
-  width: 35px;
-  height: 14px;
-  background-color: #212529;
-  clip-path: polygon(0 0, 100% 40%, 80% 100%, 0 100%);
-  border-radius: 0 4px 0 0;
-}
-/* چراغ جلو ال‌ای‌دی مدرن */
-.locomotive .headlight {
-  position: absolute;
-  bottom: 12px;
-  right: 4px;
+  bottom: 10px;
+  right: 5px;
   width: 8px;
-  height: 5px;
+  height: 6px;
   background: #fff;
   box-shadow: 0 0 10px #fff;
   border-radius: 50%;
 }
-.night .locomotive .headlight {
-  background: #00f5d4;
-  box-shadow: 0 0 25px 10px rgba(0, 245, 212, 0.8);
+
+/* روشن شدن هوشمند چراغ در عصر و شب */
+.night .headlight,
+.evening .headlight {
+  background: #22c55e;
+  box-shadow: 0 0 30px 12px rgba(34, 197, 94, 0.9);
+}
+.train-cyber .headlight {
+  background: #f43f5e !important;
+  box-shadow: 0 0 20px #f43f5e !important;
 }
 
 /* آدمک‌های ایستگاه */
@@ -303,18 +374,18 @@ body {
 .person-head {
   width: 8px;
   height: 8px;
-  background: #ffcdb2;
+  background: #fbcfe8;
   border-radius: 50%;
   margin: 0 auto;
 }
 .person-body {
   width: 10px;
   height: 12px;
-  background: #ee6c4d;
+  background: #475569;
   border-radius: 3px 3px 0 0;
 }
 
-/* HUD بالای صفحه */
+/* HUD وضعیت بالای صفحه */
 #hud {
   position: absolute;
   top: 15px;
@@ -326,35 +397,38 @@ body {
   pointer-events: none;
 }
 .hud-panel {
-  background: rgba(15, 23, 42, 0.85);
+  background: rgba(15, 23, 42, 0.9);
   padding: 10px 20px;
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1px solid #334155;
   font-size: 14px;
   font-weight: bold;
   display: flex;
   align-items: center;
-  gap: 15px;
-  backdrop-filter: blur(4px);
+  gap: 20px;
+  backdrop-filter: blur(6px);
 }
 .hud-panel span {
-  color: #00f5d4;
+  color: #38bdf8;
 }
+#coin-val {
+  color: #f59e0b !important;
+} /* رنگ طلایی سکه */
 #station-alert {
-  color: #f9c74f !important;
-  animation: blink 0.8s infinite alternate;
+  color: #ef4444 !important;
+  animation: blink 0.6s infinite alternate;
   display: none;
 }
 @keyframes blink {
   0% {
-    opacity: 0.2;
+    opacity: 0.1;
   }
   100% {
     opacity: 1;
   }
 }
 
-/* کنترلر پایینی */
+/* نوار کنترل پایین */
 #controls-bar {
   position: absolute;
   bottom: 15px;
@@ -367,48 +441,59 @@ body {
 }
 .control-group {
   display: flex;
-  gap: 10px;
+  gap: 8px;
 }
 .btn {
-  padding: 10px 20px;
-  font-size: 14px;
+  padding: 11px 18px;
+  font-size: 13px;
   font-weight: bold;
   cursor: pointer;
   border: none;
   border-radius: 8px;
   color: #fff;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   transition: all 0.1s;
 }
 .btn-blue {
   background-color: #0284c7;
 }
 .btn-red {
-  background-color: #ef4444;
+  background-color: #dc2626;
 }
 .btn-green {
-  background-color: #22c55e;
+  background-color: #16a34a;
 }
 .btn-dark {
-  background-color: #334155;
-  border: 1px solid #475569;
+  background-color: #1e293b;
+  border: 1px solid #334155;
+}
+.btn-purple {
+  background-color: #7c3aed;
 }
 .btn-action {
-  background-color: #f59e0b;
-  color: #111;
+  background-color: #eab308;
+  color: #1e293b;
   display: none;
-} /* دکمه‌های اکشن موانع */
+}
 .btn:active {
   transform: scale(0.95);
 }
 
-.score-pop {
+/* پاپ آپ‌های شناور انیمیشنی امتیاز و سکه */
+.pop-effect {
   position: absolute;
-  color: #00f5d4;
   font-weight: bold;
-  font-size: 22px;
-  animation: popUp 0.8s forwards ease-out;
+  font-size: 20px;
+  animation: popUp 0.9s forwards ease-out;
   z-index: 100;
+  pointer-events: none;
+}
+.pop-score {
+  color: #22c55e;
+}
+.pop-coin {
+  color: #fb3b1e;
+  color: #f59e0b;
 }
 @keyframes popUp {
   0% {
@@ -416,7 +501,7 @@ body {
     opacity: 1;
   }
   100% {
-    transform: translateY(-40px);
+    transform: translateY(-50px);
     opacity: 0;
   }
 }

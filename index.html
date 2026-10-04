@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0"
     />
-    <title>بازی قطار سریع‌السیر مدرن</title>
+    <title>بازی مدیریت قطارهای مدرن و سریع‌السیر</title>
     <link
       rel="shortcut icon"
       href="./favicon.ico"
@@ -18,20 +18,26 @@
     />
   </head>
   <body>
-    <div id="game-container">
+    <div
+      id="game-container"
+      class="noon"
+    >
+      <!-- پنل کاربری HUD -->
       <div id="hud">
         <div class="hud-panel">
           <div>امتیاز: <span id="score-val">0</span></div>
+          <div>ثروت: <span id="coin-val">0</span> 🪙</div>
           <div>مسافران: <span id="passengers-val">0</span> نفر</div>
         </div>
         <div class="hud-panel">
-          <div id="station-alert">⚠️ نزدیک ایستگاه! ترمز کنید!</div>
+          <div id="station-alert">🚨 ایستگاه نزدیک است! سریعاً ترمز کنید!</div>
           <div style="direction: ltr">
             SPEED: <span id="speed-val">0</span> km/h
           </div>
         </div>
       </div>
 
+      <!-- لایه‌های گرافیکی مپ -->
       <div
         class="mountain-layer"
         id="mountains"
@@ -41,11 +47,17 @@
         id="scenery-layer"
       ></div>
 
+      <!-- ریل -->
       <div id="railway-container">
         <div id="railway"></div>
       </div>
 
-      <div id="train-group">
+      <!-- کانتینر اصلی قطار (کلاس استایل پیشفرض مگلو است) -->
+      <div
+        id="train-group"
+        class="train-maglev"
+      >
+        <!-- ۵ واگن مدرن -->
         <div class="wagon">
           <div class="wagon-windows"></div>
           <div class="wheel-pair">
@@ -81,6 +93,7 @@
             <div class="wheel"></div>
           </div>
         </div>
+        <!-- لوکوموتیو -->
         <div class="locomotive">
           <div class="cabin"></div>
           <div class="headlight"></div>
@@ -95,13 +108,20 @@
         </div>
       </div>
 
+      <!-- دکمه‌های مدیریتی بازی -->
       <div id="controls-bar">
         <div class="control-group">
           <button
             class="btn btn-dark"
             id="btn-toggle-time"
           >
-            ☀️ / 🌙 تغییر زمان
+            ⏰ چرخه زمان (ظهر)
+          </button>
+          <button
+            class="btn btn-purple"
+            id="btn-change-style"
+          >
+            🔀 تعویض مدل قطار
           </button>
         </div>
 
