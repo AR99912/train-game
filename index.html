@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0"
     />
-    <title>بازی قطار دو بعدی (Tiny Rails Style)</title>
+    <title>بازی مدیریت قطار (Tiny Rails Style) - نسخه پیشرفته</title>
     <link
       rel="shortcut icon"
       href="./favicon.ico"
@@ -19,52 +19,112 @@
   </head>
   <body>
     <div id="game-container">
+      <!-- پنل وضعیت بازی -->
+      <div id="hud">
+        <div class="hud-panel">
+          <div>امتیاز: <span id="score-val">0</span></div>
+          <div>مسافران کل: <span id="passengers-val">12</span> نفر</div>
+        </div>
+        <div class="hud-panel">
+          <div id="station-alert">
+            ⚠️ در حال نزدیک شدن به ایستگاه! ترمز کنید!
+          </div>
+          <div style="direction: ltr">
+            SPEED: <span id="speed-val">0</span> km/h
+          </div>
+        </div>
+      </div>
+
+      <!-- لایه کوه‌ها -->
       <div
         class="mountain-layer"
         id="mountains"
       ></div>
 
+      <!-- لایه متحرک المان‌ها (ایستگاه، درخت، مانع) -->
       <div
-        class="scenery"
+        class="scenery-container"
         id="scenery-layer"
       >
-        <div class="tree"></div>
-        <div class="tree"></div>
-        <div class="station">ایستگاه اول</div>
-        <div class="tree"></div>
-        <div class="station">ایستگاه مرکزی</div>
-        <div class="tree"></div>
+        <!-- محتوا پویا توسط جی‌اس تزریق می‌شود -->
       </div>
 
-      <div id="railway"></div>
+      <!-- ریل -->
+      <div id="railway-container">
+        <div id="railway"></div>
+      </div>
 
+      <!-- قطار طولانی تر (۵ واگن + ۱ لوکوموتیو) -->
       <div id="train-group">
-        <div class="wagon"></div>
-        <div class="wagon"></div>
+        <div class="wagon">
+          <div class="wagon-windows"></div>
+          <div class="wheel-pair">
+            <div class="wheel"></div>
+            <div class="wheel"></div>
+          </div>
+        </div>
+        <div class="wagon">
+          <div class="wagon-windows"></div>
+          <div class="wheel-pair">
+            <div class="wheel"></div>
+            <div class="wheel"></div>
+          </div>
+        </div>
+        <div class="wagon">
+          <div class="wagon-windows"></div>
+          <div class="wheel-pair">
+            <div class="wheel"></div>
+            <div class="wheel"></div>
+          </div>
+        </div>
+        <div class="wagon">
+          <div class="wagon-windows"></div>
+          <div class="wheel-pair">
+            <div class="wheel"></div>
+            <div class="wheel"></div>
+          </div>
+        </div>
+        <div class="wagon">
+          <div class="wagon-windows"></div>
+          <div class="wheel-pair">
+            <div class="wheel"></div>
+            <div class="wheel"></div>
+          </div>
+        </div>
         <div class="locomotive">
-          <div class="cabin-window"></div>
+          <div class="cabin"></div>
           <div class="chimney"></div>
-          <div class="smoke"></div>
+          <div class="smoke-container"><div class="smoke"></div></div>
+          <div
+            class="wheel-pair"
+            style="left: 10px; right: 10px"
+          >
+            <div class="wheel"></div>
+            <div class="wheel"></div>
+            <div class="wheel"></div>
+          </div>
         </div>
       </div>
 
-      <div id="speed-display">
-        سرعت: <span id="speed-val">0</span> کیلومتر بر ساعت
-      </div>
-
-      <div id="controls">
-        <button id="btn-slow">کاهش سرعت</button>
+      <!-- دکمه‌های کنترلی پایین صفحه -->
+      <div id="controls-bar">
         <button
-          id="btn-stop"
-          style="background-color: #ffdde0"
+          class="btn btn-orange"
+          id="btn-slow"
         >
-          توقف اضطراری
+          کاهش سرعت
         </button>
         <button
-          id="btn-fast"
-          style="background-color: #e2fcd4"
+          class="btn btn-red"
+          id="btn-stop"
         >
-          افزایش سرعت
+          توقف (ترمز)
+        </button>
+        <button
+          class="btn btn-green"
+          id="btn-fast"
+        >
+          حرکت / افزایش سرعت
         </button>
       </div>
     </div>
